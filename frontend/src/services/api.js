@@ -19,6 +19,18 @@ api.interceptors.request.use(
   }
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Token expired or unauthorized, clear token and redirect to login
+      localStorage.removeItem('token');
+      // The ProtectedRoute in App.js will handle the redirection on next render
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const register = (username, password) => {
   return api.post('/auth/register', { username, password });
 };

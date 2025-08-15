@@ -1,0 +1,10 @@
+fastapi==0.111.0
+uvicorn==0.29.0
+SQLAlchemy==2.0.30
+pandas==2.2.2
+python-dotenv==1.0.1
+scikit-learn==1.5.0
+pydantic-settings==2.3.4 # Added this line
+# For testing
+pytest==8.2.2
+httpx==0.27.0

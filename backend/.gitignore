@@ -1,0 +1,5 @@
+# Python specific ignores for backend
+__pycache__/
+venv/
+*.sqlite
+*.db

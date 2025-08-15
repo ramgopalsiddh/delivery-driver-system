@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import DriverTable from '../components/DriverTable';
 import OrderList from '../components/OrderList';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
   const [drivers, setDrivers] = useState([]);
@@ -42,6 +46,28 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  const onTimeLateData = kpis ? {
+    labels: ['On-time Deliveries', 'Late Deliveries'],
+    datasets: [
+      {
+        data: [kpis.on_time_deliveries, kpis.late_deliveries],
+        backgroundColor: ['#36A2EB', '#FF6384'],
+        hoverBackgroundColor: ['#36A2EB', '#FF6384'],
+      },
+    ],
+  } : {};
+
+  const fuelCostData = kpis ? {
+    labels: ['Total Fuel Cost', 'Other Costs'], // Assuming 'Other Costs' is total profit - fuel cost
+    datasets: [
+      {
+        data: [kpis.total_fuel_cost, kpis.total_profit - kpis.total_fuel_cost],
+        backgroundColor: ['#FFCE56', '#4BC0C0'],
+        hoverBackgroundColor: ['#FFCE56', '#4BC0C0'],
+      },
+    ],
+  } : {};
+
   if (loading) return <div className="text-center text-gray-600">Loading dashboard data...</div>;
   if (error) return <div className="text-center text-red-500">Error: {error}</div>;
 
@@ -76,6 +102,17 @@ const Dashboard = () => {
             <div className="bg-gray-50 p-3 rounded-lg shadow-sm">
               <p className="text-gray-600 text-sm">Total Fuel Cost</p>
               <p className="text-xl font-bold text-red-600">₹{kpis.total_fuel_cost.toFixed(2)}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+            <div className="bg-white p-4 shadow-md rounded-lg">
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">On-time vs Late Deliveries</h3>
+              <Pie data={onTimeLateData} />
+            </div>
+            <div className="bg-white p-4 shadow-md rounded-lg">
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">Fuel Cost Breakdown</h3>
+              <Pie data={fuelCostData} />
             </div>
           </div>
         </section>

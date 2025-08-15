@@ -6,16 +6,15 @@ import pytest
 # Load environment variables from .env.example for testing
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.example'), override=True)
 
-# Import all models to ensure Base.metadata is aware of them for table creation
-import app.models.driver
-import app.models.order
-import app.models.route
-import app.models.assignment
-import app.models.user
-import app.models.simulation_run
-
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
+    # Import all models to ensure Base.metadata is aware of them for table creation
+    import app.models.driver
+    import app.models.order
+    import app.models.route
+    import app.models.assignment
+    import app.models.user
+    import app.models.simulation_run
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)

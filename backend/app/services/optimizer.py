@@ -6,11 +6,12 @@ from app.crud import assignment as crud_assignment
 from app.crud import order as crud_order
 from app.crud import route as crud_route
 from app.crud import driver as crud_driver
-from app.crud import simulation_run as crud_simulation_run # New import
+from app.crud import simulation_run as crud_simulation_run
 from app.schemas.assignment import AssignmentCreate
-from app.schemas.simulation_run import SimulationRunCreate # New import
-from app.schemas.optimization import SimulationInput # New import
+from app.schemas.simulation_run import SimulationRunCreate
+from app.schemas.optimization import SimulationInput
 from datetime import datetime, timedelta
+from fastapi import HTTPException
 
 # Company Rule Constants
 LATE_DELIVERY_PENALTY = 50  # ₹50
@@ -29,7 +30,7 @@ class Optimizer:
             "medium": 0.3, # 30% increase
             "high": 0.6   # 60% increase
         }
-        self._last_kpis = None # New: Store last calculated KPIs
+        self._last_kpis = None # Store last calculated KPIs
 
     def _calculate_estimated_delivery_time(self, route: Route, driver: Driver) -> timedelta:
         # estimated_delivery_time = base_time_minutes + traffic_factor + (distance_km / avg_speed)*60
@@ -193,6 +194,7 @@ class Optimizer:
 
                 # Calculate KPIs for this order
                 is_on_time = estimated_delivery_time_for_order <= order.delivery_time
+                print(f"DEBUG: Order {order.order_id} - Requested: {order.delivery_time} (Type: {type(order.delivery_time)}), Estimated: {estimated_delivery_time_for_order} (Type: {type(estimated_delivery_time_for_order)}), Is On Time: {is_on_time}") # DEBUG
                 penalty = self._calculate_late_delivery_penalty(estimated_delivery_time_for_order, order.delivery_time)
                 bonus = self._calculate_high_value_bonus(order.value, is_on_time)
                 fuel_cost = self._calculate_fuel_cost(route)

@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware # Added import
 
 from app.core.database import engine, Base, get_db
-from app.api import drivers, orders, routes, optimization, simulation_history # New import
+from app.api import drivers, orders, routes, optimization, simulation_history, auth # New import
+from app.core.security import get_current_user # New import
+import app.models.user # Ensure User model is registered with Base.metadata
 from app.services.data_loader import load_all_data
 
 app = FastAPI(
@@ -35,11 +37,12 @@ def on_startup():
     load_all_data(db)
     db.close()
 
-app.include_router(drivers.router)
-app.include_router(orders.router)
-app.include_router(routes.router)
-app.include_router(optimization.router)
-app.include_router(simulation_history.router) # New router include
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(drivers.router, dependencies=[Depends(get_current_user)])
+app.include_router(orders.router, dependencies=[Depends(get_current_user)])
+app.include_router(routes.router, dependencies=[Depends(get_current_user)])
+app.include_router(optimization.router, dependencies=[Depends(get_current_user)])
+app.include_router(simulation_history.router, dependencies=[Depends(get_current_user)]) # New router include
 
 @app.get("/", tags=["Root"])
 async def read_root():

@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy.orm import Session
 from datetime import datetime
+import os # New import
 
 from app.crud import driver as crud_driver
 from app.crud import order as crud_order
@@ -8,6 +9,10 @@ from app.crud import route as crud_route
 from app.schemas.driver import DriverCreate
 from app.schemas.order import OrderCreate
 from app.schemas.route import RouteCreate
+
+# Define the base directory for data files relative to this script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "..", "..", "data")
 
 def load_drivers_from_csv(db: Session, file_path: str):
     df = pd.read_csv(file_path, sep=',') # Read as comma-separated
@@ -61,8 +66,7 @@ def load_routes_from_csv(db: Session, file_path: str):
         crud_route.create_or_update_route(db, route_data)
 
 def load_all_data(db: Session):
-    # Assuming CSVs are in the same directory as this script or accessible via relative path
-    # For Docker, these paths will be relative to the container's working directory
-    load_drivers_from_csv(db, "./data/drivers.csv")
-    load_orders_from_csv(db, "./data/orders.csv")
-    load_routes_from_csv(db, "./data/routes.csv")
+    # Use absolute paths for CSVs
+    load_drivers_from_csv(db, os.path.join(DATA_DIR, "drivers.csv"))
+    load_orders_from_csv(db, os.path.join(DATA_DIR, "orders.csv"))
+    load_routes_from_csv(db, os.path.join(DATA_DIR, "routes.csv"))

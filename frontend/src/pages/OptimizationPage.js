@@ -60,10 +60,11 @@ const OptimizationPage = () => {
       const response = await api.post('/assign_orders', payload);
       setMessage(response.data.message);
       setKpis(response.data.kpis); // Set KPIs
+      console.log("KPIs received from backend:", response.data.kpis); // DEBUG
 
       const scheduleResponse = await api.get('/optimized_schedule');
       console.log("Optimized Schedule Response:", scheduleResponse.data); // DEBUG LOG
-      setOptimizedSchedule(scheduleResponse.data);
+      setOptimizedSchedule(scheduleResponse.data.schedule); // Access schedule property
 
     } catch (err) {
       setError('Failed to run optimization');
